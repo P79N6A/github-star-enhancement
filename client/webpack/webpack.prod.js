@@ -1,7 +1,8 @@
 const common = require('./webpack.common.js')
 const webpack = require('webpack')
-const UglifyJSPlugin = require('uglifyjs-webpack-plugin')
+const TerserPlugin = require('terser-webpack-plugin')
 const merge = require('webpack-merge')
+const BundleAnalyzerPlugin = require('webpack-bundle-analyzer').BundleAnalyzerPlugin
 
 let apiEndpoint = process.env['API_ENDPOINT']
 let graphqlEndpoint = process.env['GRAPHQL_ENDPOINT']
@@ -10,10 +11,12 @@ let graphqlEndpoint = process.env['GRAPHQL_ENDPOINT']
 
 module.exports = merge(common, {
   mode: 'production',
-  plugins: [
-    new UglifyJSPlugin({
+  optimization: {
+    minimizer: [new TerserPlugin({
       sourceMap: true,
-    }),
+    })],
+  },
+  plugins: [
     new webpack.DefinePlugin({
       'process.env': {
         'API_ENDPOINT': JSON.stringify(apiEndpoint),
@@ -22,5 +25,6 @@ module.exports = merge(common, {
         // 'APP_SECRET': JSON.stringify(app_secret),
       },
     }),
+    new BundleAnalyzerPlugin(),
   ],
 })
